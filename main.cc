@@ -20,6 +20,7 @@ JNIEXPORT int cmd( simlab name );
 
 int module;
 extern int (*prnt)( const char*, ... );
+extern int postprintf( const char*, ... );
 extern int current;
 
 extern simlab nulldata;
@@ -95,13 +96,14 @@ void initdl() {
 #endif
 
 JNIEXPORT int init() {
-	prnt = printf;
 	current = (long)&data;
 
 #ifdef DL
 	module = dopen( NULL );
+	prnt = printf;
 #else
 	module = NULL;
+	prnt = postprintf;
 	initdl();
 #endif
 

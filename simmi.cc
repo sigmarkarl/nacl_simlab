@@ -22,9 +22,12 @@
 
 #include <cstdio>
 #include <string>
+#include <map>
 #include "ppapi/cpp/instance.h"
 #include "ppapi/cpp/module.h"
 #include "ppapi/cpp/var.h"
+
+extern std::map<std::string,long> dlmap;
 
 /// The Instance class.  One of these exists for each instance of your NaCl
 /// module on the web page.  The browser will ask the Module object to create
@@ -58,8 +61,11 @@ class simmiInstance : public pp::Instance {
 	    if (!var_message.is_string()) {
 	      return;
 	    }
-	    /*std::string message = var_message.AsString();
-	    pp::Var return_var;
+
+	    std::string message = var_message.AsString();
+	    long (*func)() = (long (*)())dlmap[ message ];
+	    func();
+	    /*pp::Var return_var;
 	    if (message == kFortyTwoMethodId) {
 	      // Note that no arguments are passed in to FortyTwo.
 	      return_var = MarshallFortyTwo();
@@ -76,9 +82,15 @@ class simmiInstance : public pp::Instance {
 	    // directly from here.  The return post is asynhronous: PostMessage returns
 	    // immediately.
 	    //PostMessage(return_var);
-	    PostMessage(var_message);
+	    //PostMessage(var_message);
   }
 };
+
+simmiInstance* gsimst;
+int postprintf( const char* c, ... ) {
+	pp::Var return_var(c);
+	gsimst->PostMessage( return_var );
+}
 
 /// The Module class.  The browser calls the CreateInstance() method to create
 /// an instance of your NaCl module on the web page.  The browser creates a new
@@ -92,7 +104,9 @@ class simmiModule : public pp::Module {
   /// @param[in] instance The browser-side instance.
   /// @return the plugin-side instance.
   virtual pp::Instance* CreateInstance(PP_Instance instance) {
-    return new simmiInstance(instance);
+	  simmiInstance* simst = new simmiInstance(instance);
+	  gsimst = simst;
+    return simst;
   }
 };
 
