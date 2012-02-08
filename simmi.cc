@@ -28,6 +28,9 @@
 #include "ppapi/cpp/var.h"
 
 extern std::map<std::string,long> dlmap;
+extern int init();
+
+int postprintf( const char*, ... );
 
 /// The Instance class.  One of these exists for each instance of your NaCl
 /// module on the web page.  The browser will ask the Module object to create
@@ -63,8 +66,11 @@ class simmiInstance : public pp::Instance {
 	    }
 
 	    std::string message = var_message.AsString();
+	    postprintf( message.c_str() );
 	    long (*func)() = (long (*)())dlmap[ message ];
-	    func();
+	    if( func != NULL ) func();
+	    else postprintf( "moos" );
+
 	    /*pp::Var return_var;
 	    if (message == kFortyTwoMethodId) {
 	      // Note that no arguments are passed in to FortyTwo.
@@ -86,9 +92,12 @@ class simmiInstance : public pp::Instance {
   }
 };
 
+char cc[5000];
 simmiInstance* gsimst;
 int postprintf( const char* c, ... ) {
-	pp::Var return_var(c);
+
+	sprintf( cc, c, next );
+	pp::Var return_var(cc);
 	gsimst->PostMessage( return_var );
 }
 
@@ -104,6 +113,7 @@ class simmiModule : public pp::Module {
   /// @param[in] instance The browser-side instance.
   /// @return the plugin-side instance.
   virtual pp::Instance* CreateInstance(PP_Instance instance) {
+	  init();
 	  simmiInstance* simst = new simmiInstance(instance);
 	  gsimst = simst;
     return simst;
