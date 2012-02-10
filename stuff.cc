@@ -2673,7 +2673,7 @@ JNIEXPORT int getptr( int byteoffset ) {
 
 JNIEXPORT int welcome() {
 	simlab str;
-	str.buffer =  (long)"Welcome to SimLab 2.1";
+	str.buffer =  (long)"Welcome to SimLab 3.0";
 	echo( str );
 	return 0;
 }

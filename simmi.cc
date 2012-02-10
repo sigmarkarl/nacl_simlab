@@ -23,6 +23,8 @@
 #include <cstdio>
 #include <string>
 #include <map>
+#include <cstring>
+#include <cstdarg>
 #include "ppapi/cpp/instance.h"
 #include "ppapi/cpp/module.h"
 #include "ppapi/cpp/var.h"
@@ -93,10 +95,21 @@ class simmiInstance : public pp::Instance {
 };
 
 char cc[5000];
+typedef struct erm {
+	long a1;
+	long a2;
+	long a3;
+	long a4;
+};
+erm	theerm;
 simmiInstance* gsimst;
 int postprintf( const char* c, ... ) {
-
-	sprintf( cc, c, next );
+	//std::memcpy( &theerm, c+1, sizeof(erm) );
+	va_list	ap;
+	va_start( ap, c );
+	char* av = va_arg( ap, char* );
+	sprintf( cc, c, av );
+	va_end( ap );
 	pp::Var return_var(cc);
 	gsimst->PostMessage( return_var );
 }

@@ -21,7 +21,7 @@ fi
 # build applications that target the pepper_17 API, set
 #   NACL_TARGET_PLATFORM="pepper_17"
 if [ x"${NACL_TARGET_PLATFORM}"x == "xx" ] ; then
-  export NACL_TARGET_PLATFORM="pepper_17"
+  export NACL_TARGET_PLATFORM="pepper_16"
 fi
 
 readonly NACL_PLATFORM_DIR="${NACL_SDK_ROOT}/${NACL_TARGET_PLATFORM}"
