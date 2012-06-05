@@ -29,10 +29,8 @@
 #include "ppapi/cpp/module.h"
 #include "ppapi/cpp/var.h"
 
-extern std::map<std::string,long> dlmap;
-extern int init();
-
-int postprintf( const char*, ... );
+extern "C" char* erm( int argc, const char* argv[] );
+extern "C" char* dna( int argc, const char* argv[] );
 
 /// The Instance class.  One of these exists for each instance of your NaCl
 /// module on the web page.  The browser will ask the Module object to create
@@ -68,12 +66,24 @@ class simmiInstance : public pp::Instance {
 	    }
 
 	    std::string message = var_message.AsString();
-	    postprintf( message.c_str() );
-	    long (*func)() = (long (*)())dlmap[ message ];
+	    const char* c = message.c_str();
+	    char* ret;
+	    if( c[0] == 'f' ) {
+		const char* cc[] = { "FastTree", "-nt", c+1 };
+		ret = erm( 3, cc );
+	    } else {
+		const char* cc[] = { "dnapars", c+1 };
+		ret = dna( 2, cc );
+	    }
+
+	    pp::Var return_var( ret );
+	    PostMessage(return_var);
+	    
+	/*long (*func)() = (long (*)())dlmap[ message ];
 	    if( func != NULL ) func();
 	    else postprintf( "moos" );
 
-	    /*pp::Var return_var;
+	    pp::Var return_var;
 	    if (message == kFortyTwoMethodId) {
 	      // Note that no arguments are passed in to FortyTwo.
 	      return_var = MarshallFortyTwo();
@@ -95,15 +105,8 @@ class simmiInstance : public pp::Instance {
 };
 
 char cc[5000];
-typedef struct erm {
-	long a1;
-	long a2;
-	long a3;
-	long a4;
-};
-erm	theerm;
 simmiInstance* gsimst;
-int postprintf( const char* c, ... ) {
+extern "C" int postprint( const char* c, ... ) {
 	//std::memcpy( &theerm, c+1, sizeof(erm) );
 	va_list	ap;
 	va_start( ap, c );
@@ -126,9 +129,8 @@ class simmiModule : public pp::Module {
   /// @param[in] instance The browser-side instance.
   /// @return the plugin-side instance.
   virtual pp::Instance* CreateInstance(PP_Instance instance) {
-	  init();
 	  simmiInstance* simst = new simmiInstance(instance);
-	  gsimst = simst;
+          gsimst = simst;
     return simst;
   }
 };

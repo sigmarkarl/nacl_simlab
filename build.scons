@@ -15,6 +15,6 @@ nacl_env.Append(
 	LIBS=['nosys']
 )
 
-sources = ['simmi.cc', 'main.cc', 'stuff.cc', 'parse.cc', 'printers.cc']
+sources = ['simmi.cc', 'fasttree.c', 'dnapars.c', 'phylip.c', 'seq.c']
 
 nacl_env.AllNaClModules(sources, 'simmi')
