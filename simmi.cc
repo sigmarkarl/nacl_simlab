@@ -31,6 +31,7 @@
 
 extern "C" char* erm( int argc, const char* argv[] );
 extern "C" char* dna( int argc, const char* argv[] );
+extern "C" char* ml( int argc, const char* argv[] );
 
 /// The Instance class.  One of these exists for each instance of your NaCl
 /// module on the web page.  The browser will ask the Module object to create
@@ -71,9 +72,12 @@ class simmiInstance : public pp::Instance {
 	    if( c[0] == 'f' ) {
 		const char* cc[] = { "FastTree", "-nt", c+1 };
 		ret = erm( 3, cc );
-	    } else {
+	    } else if( c[0] == 'p' ) {
 		const char* cc[] = { "dnapars", c+1 };
 		ret = dna( 2, cc );
+	    } else {
+		const char* cc[] = { "dnaml", c+1 };
+		ret = ml( 2, cc );
 	    }
 
 	    pp::Var return_var( ret );
