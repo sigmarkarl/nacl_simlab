@@ -449,7 +449,7 @@ void getoptions_ml()
       countup(&loopcount, 10);
     } while (cv <= 0.0);
     alpha = 1.0 / (cv * cv);
-  }
+  }*/
   if (!rctgry)
     auto_ = false;
   if (rctgry) {
@@ -497,7 +497,7 @@ void getoptions_ml()
   if (!didchangecat){
     rate       = (double *) Malloc(categs*sizeof(double));
     rate[0]    = 1.0;
-  }*/
+  }
 }  /* getoptions */
 
 
@@ -546,22 +546,22 @@ void allocrest_ml()
 
 void doinit_ml()
 { /* initializes variables */
-postprint("tokst");
   inputnumbers(&spp, &sites, &nonodes2, 1);
-postprint("erm%d",nonodes2);
   getoptions_ml();
-postprint("ee");
+//postprint("ee");
  // if (printdata)
  //   fprintf(outfile, "%2ld species, %3ld  sites\n", spp, sites);
   alloctree(&curtree.nodep, nonodes2, usertree);
+//postprint("oop%d", (int)usertree);
   allocrest_ml();
   if (usertree)
     return;
   alloctree(&bestree.nodep, nonodes2, 0);
   alloctree(&priortree.nodep, nonodes2, 0);
+//postprint("pp%d", njumble);
   if (njumble <= 1)
     return;
-postprint("alm");
+//postprint("alm");
   alloctree(&bestree2.nodep, nonodes2, 0);
 }  /* doinit */
 
@@ -728,20 +728,23 @@ void inittable()
   /* Define a lookup table. Precompute values and print them out in tables */
   long i, j;
   double sumrates;
-  
+ fprintf(stderr, "mubmo %d %d\n", (int)rcategs, (int)categs); 
   tbl = (valrec ***) Malloc(rcategs * sizeof(valrec **));
   for (i = 0; i < rcategs; i++) {
     tbl[i] = (valrec **) Malloc(categs*sizeof(valrec *));
     for (j = 0; j < categs; j++)
       tbl[i][j] = (valrec *) Malloc(sizeof(valrec));
   }
+fprintf(stderr, "jumbo\n");
 
   for (i = 0; i < rcategs; i++) {
     for (j = 0; j < categs; j++) {
+fprintf(stderr, "hehe %d %d\n", (int)rrate, (int)rate);
       tbl[i][j]->rat = rrate[i]*rate[j];
       tbl[i][j]->ratxi = tbl[i][j]->rat * xi;
       tbl[i][j]->ratxv = tbl[i][j]->rat * xv;
 
+	fprintf(stderr, "eeerm %d %d\n", i, j);
       /* Allocate assuming bifurcations, will be changed later if
          necessary (i.e. there's a user tree) */
       tbl[i][j]->ww   = (double *) Malloc( 2 * sizeof (double));
@@ -750,6 +753,8 @@ void inittable()
       tbl[i][j]->vvzz = (double *) Malloc( 2 * sizeof (double));
     }
   }
+
+fprintf(stderr,"lumbo\n");
   if (!lngths) {            /* restandardize rates */
     sumrates = 0.0;
     for (i = 0; i < endsite; i++) {
@@ -765,6 +770,7 @@ void inittable()
         tbl[i][j]->ratxv /= sumrates;
       }
   }
+printf(stderr,"herr doktor\n");
 
   if(jumb > 1)
     return;
@@ -2131,7 +2137,7 @@ void dnaml_treeout(node *p)
   node *q;
   boolean inloop;
   
-  
+ fprintf( stderr, "outtree %d\n", (int)outtree );
   if (p->tip) {
     n = 0;
     for (i = 1; i <= nmlngth; i++) {
@@ -2305,7 +2311,9 @@ void maketree_ml()
   long nextnode;
   node *root;
 
+fprintf(stderr, "tabbi\n");
   inittable();
+fprintf(stderr, "kbbi\n");
 
   if (usertree) {
     /* Open in binary: ftell() is broken for UNIX line-endings under WIN32 */
@@ -2380,13 +2388,14 @@ void maketree_ml()
       standev2(numtrees, maxwhich, 0, endsite-1, maxlogl,
                l0gl, l0gf, aliasweight, seed);
   } else {
+fprintf(stderr, "lost\n");
     /* If there's no input user tree, */
     for (i = 1; i <= spp; i++)
       enterorder[i - 1] = i;
     if (jumble)
       randumize(seed, enterorder);
     if (progress) {
-      printf("\nAdding species:\n");
+      fprintf(stderr, "\nAdding species:\n");
       writename(0, 3, enterorder);
 #ifdef WIN32
       phyFillScreenColor();
@@ -2447,12 +2456,15 @@ void maketree_ml()
       }
       nextsp++;
     }
+fprintf(stderr, "muu\n");
     if ( !smoothit)
       dnamlcopy(&curtree, &bestree, nonodes2, rcategs);
     if (global && progress) {
       putchar('\n');
       fflush(stdout);
     }
+
+fprintf(stderr, "wereeh\n");
     if (njumble > 1) {
       if (jumb == 1)
         dnamlcopy(&bestree, &bestree2, nonodes2, rcategs);
@@ -2460,6 +2472,7 @@ void maketree_ml()
         if (bestree2.likelihood < bestree.likelihood)
           dnamlcopy(&bestree, &bestree2, nonodes2, rcategs);
     }
+fprintf( stderr, "lock\n" );
     if (jumb == njumble) {
       if (njumble > 1)
         dnamlcopy(&bestree2, &curtree, nonodes2, rcategs);
@@ -2473,15 +2486,20 @@ void maketree_ml()
           curtree.nodep[i]->next->next->initialized = false;
         } 
       }
+fprintf( stderr, "ee\n" );
       treevaluate_ml();
+fprintf( stderr, "ok\n" );
       dnaml_printree();
+fprintf( stderr, "pp\n" );
       summarize();
       if (trout) {
         col = 0;
+fprintf( stderr, "dd\n" );
         dnaml_treeout(curtree.start);
       }
     }
   }
+fprintf(stderr, "lorri\n");
   if (usertree) {
     free(l0gl);
     for (i=0; i < shimotrees; i++)
@@ -2548,7 +2566,7 @@ void clean_up()
 #endif
 }   /* clean_up */
 
-extern char* buf3;
+char* buf4[100000];
 char* ml(int argc, Char *argv[])
 {  /* DNA Maximum Likelihood */
 #ifdef MAC
@@ -2573,31 +2591,38 @@ char* ml(int argc, Char *argv[])
     openfile(&catfile,CATFILE,"categories file","r",argv[0],catfilename);
   if (weights || justwts)
     openfile(&weightfile,WEIGHTFILE,"weights file","r",argv[0],weightfilename);
-  if (trout)
-	outtree = fmemopen( buf3, 100000, "w" );
+  //if (trout)
+  outtree = fmemopen( buf4, 100000, "w" );
     //openfile(&outtree,OUTTREE,"output tree file","w",argv[0],outtreename);
   if (!usertree) nonodes2--;
+
+	fprintf(stderr, "what!\n");
   for (ith = 1; ith <= datasets; ith++) {
     if (datasets > 1) {
       fprintf(outfile, "Data set # %ld:\n", ith);
-      printf("\nData set # %ld:\n", ith);
+//      printf("\nData set # %ld:\n", ith);
     }
     ttratio = ttratio0;
     getinput();
+fprintf(stderr, "after input2 %d\n", (int)outtree );
     if (ith == 1)
       firstset = false;
     if (usertree)
       maketree_ml();
-    else
+    else {
       for (jumb = 1; jumb <= njumble; jumb++)
         maketree_ml();
+
+	fprintf( stderr, "last\n" );
+    }
+    fprintf( stderr, "next\n");
   }
 
   clean_up();
-  printf("\nDone.\n\n");
+  //printf("\nDone.\n\n");
 #ifdef WIN32
   phyRestoreConsoleAttributes();
 #endif
-  return buf3;
+  return buf4;
 }  /* DNA Maximum Likelihood */
  
