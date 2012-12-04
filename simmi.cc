@@ -25,13 +25,18 @@
 #include <map>
 #include <cstring>
 #include <cstdarg>
+#include <cassert>
+#include <cmath>
+#include <limits>
+#include <sstream>
+#include "ppapi/cpp/audio.h"
 #include "ppapi/cpp/instance.h"
 #include "ppapi/cpp/module.h"
 #include "ppapi/cpp/var.h"
 
-extern "C" char* erm( int argc, const char* argv[] );
-extern "C" char* dna( int argc, const char* argv[] );
-extern "C" char* ml( int argc, const char* argv[] );
+extern char* erm( int argc, const char* argv[] );
+extern char* dna( int argc, const char* argv[] );
+extern char* ml( int argc, const char* argv[] );
 
 /// The Instance class.  One of these exists for each instance of your NaCl
 /// module on the web page.  The browser will ask the Module object to create
@@ -50,6 +55,7 @@ class simmiInstance : public pp::Instance {
   {}
   virtual ~simmiInstance() {}
 
+  virtual bool Init(uint32_t argc, const char* argn[], const char* argv[]);
   /// Handler for messages coming in from the browser via postMessage().  The
   /// @a var_message can contain anything: a JSON string; a string that encodes
   /// method names and arguments; etc.  For example, you could use
@@ -110,7 +116,7 @@ class simmiInstance : public pp::Instance {
 
 char cc[5000];
 simmiInstance* gsimst;
-extern "C" int postprint( const char* c, ... ) {
+extern int postprint( const char* c, ... ) {
 	//std::memcpy( &theerm, c+1, sizeof(erm) );
 	va_list	ap;
 	va_start( ap, c );
@@ -119,6 +125,14 @@ extern "C" int postprint( const char* c, ... ) {
 	va_end( ap );
 	pp::Var return_var(cc);
 	gsimst->PostMessage( return_var );
+
+	return 0;
+}
+
+bool simmiInstance::Init(uint32_t argc,
+                             const char* argn[],
+                             const char* argv[]) {
+  return true;
 }
 
 /// The Module class.  The browser calls the CreateInstance() method to create

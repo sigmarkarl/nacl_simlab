@@ -10,6 +10,7 @@
 
 extern void postprint( const char*, ... );
 
+namespace dnaml {
 typedef struct valrec {
   double rat, ratxi, ratxv, orig_zz, z1, y1, z1zz, z1yy, xiz1, xiy1xv;
   double *ww, *zz, *wwzz, *vvzz; 
@@ -770,7 +771,7 @@ fprintf(stderr,"lumbo\n");
         tbl[i][j]->ratxv /= sumrates;
       }
   }
-printf(stderr,"herr doktor\n");
+fprintf(stderr,"herr doktor\n");
 
   if(jumb > 1)
     return;
@@ -1477,11 +1478,11 @@ void alloclrsaves()
 {
   long i,j;
 
-  lrsaves = Malloc(NLRSAVES * sizeof(node*));
+  lrsaves = (node**)Malloc(NLRSAVES * sizeof(node*));
   for ( i = 0 ; i < NLRSAVES ; i++ ) {
-    lrsaves[i] = Malloc(sizeof(node));
+    lrsaves[i] = (node*)Malloc(sizeof(node));
     lrsaves[i]->x = (phenotype)Malloc(endsite*sizeof(ratelike));
-    lrsaves[i]->underflows = Malloc(endsite * sizeof (double));
+    lrsaves[i]->underflows = (double*)Malloc(endsite * sizeof (double));
     for (j = 0; j < endsite; j++)
       lrsaves[i]->x[j]  = (ratelike)Malloc(rcategs*sizeof(sitelike));
   }
@@ -2565,60 +2566,61 @@ void clean_up()
   fixmacfile(outtreename);
 #endif
 }   /* clean_up */
+};
 
-char* buf4[100000];
-char* ml(int argc, Char *argv[])
+char buf4[100000];
+char* ml(int argc, const char *argv[])
 {  /* DNA Maximum Likelihood */
 #ifdef MAC
   argc = 1;                /* macsetup("DnaML","");        */
   argv[0] = "DnaML";
 #endif
-  init(argc,argv);
-  progname = argv[0];
-  infile = fmemopen( argv[1], strlen( argv[1] ), "r" );
+  init(argc,(char**)argv);
+  dnaml::progname = (char*)argv[0];
+  infile = fmemopen( (char*)argv[1], strlen( argv[1] ), "r" );
   outfile = stderr;
   //openfile(&infile,INFILE,"input file","r",argv[0],infilename);
   //openfile(&outfile,OUTFILE,"output file","w",argv[0],outfilename);
-  mulsets = false;
-  datasets = 1;
-  firstset = true;
+  dnaml::mulsets = false;
+  dnaml::datasets = 1;
+  dnaml::firstset = true;
   ibmpc = IBMCRT;
   ansi = ANSICRT;
-  grbg = NULL;
-  doinit_ml();
-  ttratio0 = ttratio;
-  if (ctgry)
-    openfile(&catfile,CATFILE,"categories file","r",argv[0],catfilename);
-  if (weights || justwts)
-    openfile(&weightfile,WEIGHTFILE,"weights file","r",argv[0],weightfilename);
+  dnaml::grbg = NULL;
+  dnaml::doinit_ml();
+  dnaml::ttratio0 = dnaml::ttratio;
+  if (dnaml::ctgry)
+    openfile(&catfile,CATFILE,"categories file","r",argv[0],dnaml::catfilename);
+  if (dnaml::weights || dnaml::justwts)
+    openfile(&weightfile,WEIGHTFILE,"weights file","r",argv[0],dnaml::weightfilename);
   //if (trout)
   outtree = fmemopen( buf4, 100000, "w" );
     //openfile(&outtree,OUTTREE,"output tree file","w",argv[0],outtreename);
-  if (!usertree) nonodes2--;
+  if (!dnaml::usertree) dnaml::nonodes2--;
 
 	fprintf(stderr, "what!\n");
-  for (ith = 1; ith <= datasets; ith++) {
-    if (datasets > 1) {
-      fprintf(outfile, "Data set # %ld:\n", ith);
+  for (dnaml::ith = 1; dnaml::ith <= dnaml::datasets; dnaml::ith++) {
+    if (dnaml::datasets > 1) {
+      fprintf(outfile, "Data set # %ld:\n", dnaml::ith);
 //      printf("\nData set # %ld:\n", ith);
     }
-    ttratio = ttratio0;
-    getinput();
+    dnaml::ttratio = dnaml::ttratio0;
+    dnaml::getinput();
 fprintf(stderr, "after input2 %d\n", (int)outtree );
-    if (ith == 1)
-      firstset = false;
-    if (usertree)
-      maketree_ml();
+    if (dnaml::ith == 1)
+      dnaml::firstset = false;
+    if (dnaml::usertree)
+      dnaml::maketree_ml();
     else {
-      for (jumb = 1; jumb <= njumble; jumb++)
-        maketree_ml();
+      for (dnaml::jumb = 1; dnaml::jumb <= dnaml::njumble; dnaml::jumb++)
+        dnaml::maketree_ml();
 
 	fprintf( stderr, "last\n" );
     }
     fprintf( stderr, "next\n");
   }
 
-  clean_up();
+  dnaml::clean_up();
   //printf("\nDone.\n\n");
 #ifdef WIN32
   phyRestoreConsoleAttributes();

@@ -29,7 +29,7 @@ void phyFillScreenColor();
 #endif /* WIN32 */
 
 #ifndef OLDC
-static void crash_handler(int signum);
+/*static void crash_handler(int signum);*/
 
 #endif
 #if defined(OSX_CARBON) && defined(__MWERKS__)
@@ -40,35 +40,35 @@ long spp, words, bits;
 boolean ibmpc, ansi, tranvsp;
 naym *nayme;                     /* names of species */
 
-static void crash_handler(int sig_num)
-{ /* when we crash, lets print out something usefull */
+/*static void crash_handler(int sig_num)
+{ * when we crash, lets print out something usefull *
   printf("ERROR:  ");
   switch(sig_num) {
 #ifdef SIGSEGV
     case SIGSEGV:
       puts("This program has caused a Segmentation fault.");
       break;
-#endif /* SIGSEGV */
+#endif * SIGSEGV *
 #ifdef SIGFPE
     case SIGFPE:
       puts("This program has caused a Floating Point Exception");
       break;
-#endif  /* SIGFPE */
+#endif  * SIGFPE *
 #ifdef SIGILL
     case SIGILL:
       puts("This program has attempted an illegal instruction");
       break;
-#endif  /* SIGILL */
+#endif  * SIGILL *
 #ifdef SIGPIPE 
     case SIGPIPE:
       puts("This program tried to write to a broken pipe");
       break;
-#endif  /* SIGPIPE */
+#endif  * SIGPIPE *
 #ifdef SIGBUS
     case SIGBUS:
       puts("This program had a bus error");
       break;
-#endif /* SIGBUS */
+#endif * SIGBUS *
   }   
   if (sig_num == SIGSEGV) {
     puts(
@@ -89,7 +89,7 @@ static void crash_handler(int sig_num)
   phyRestoreConsoleAttributes();
 #endif
   abort();
-}
+}*/
 
 
 void init(int argc, char** argv) 
@@ -100,21 +100,21 @@ void init(int argc, char** argv)
    * segfault, floating point exception, illeagal instruction, bad pipe, bus error
    * there are more signals that can cause a crash, but these are the most common
    * even these aren't found on all machines.  */
-#ifdef SIGSEGV
+/*#ifdef SIGSEGV
   signal(SIGSEGV, crash_handler);
-#endif /* SIGSEGV */
+#endif * SIGSEGV *
 #ifdef SIGFPE
   signal(SIGFPE, crash_handler);
-#endif /* SIGFPE */
+#endif * SIGFPE *
 #ifdef SIGILL
   signal(SIGILL, crash_handler);
-#endif /* SIGILL */
+#endif * SIGILL *
 #ifdef SIGPIPE
   signal(SIGPIPE, crash_handler);
-#endif /* SIGPIPE */
+#endif * SIGPIPE *
 #ifdef SIGBUS
   signal(SIGBUS, crash_handler);
-#endif /* SIGBUS */
+#endif * SIGBUS */
 
   /* Set default terminal characteristics */
   ibmpc = IBMCRT;
@@ -448,7 +448,7 @@ long readlong(const char *prompt)
 
 void uppercase(Char *ch)
 { /* convert ch to upper case */
-  *ch = (islower (*ch) ? toupper(*ch) : (*ch));
+  *ch = (islower ((int)*ch) ? toupper((int)*ch) : (*ch));
 }  /* uppercase */
 
 
@@ -1279,9 +1279,9 @@ void inputweightsold(long chars, steptr weight, boolean *weights)
         ch = ' ';
     } while (ch == ' ');
     weight[i] = 1;
-    if (isdigit(ch))
+    if (isdigit((int)ch))
       weight[i] = ch - '0';
-    else if (isalpha(ch)) {
+    else if (isalpha((int)ch)) {
       uppercase(&ch);
       weight[i] = ch - 'A' + 10;
     } else {
@@ -1309,9 +1309,9 @@ void inputweights(long chars, steptr weight, boolean *weights)
         ch = ' ';
     } while (ch == ' ');
     weight[i] = 1;
-    if (isdigit(ch))
+    if (isdigit((int)ch))
       weight[i] = ch - '0';
-    else if (isalpha(ch)) {
+    else if (isalpha((int)ch)) {
       uppercase(&ch);
       weight[i] = ch - 'A' + 10;
     } else {
@@ -1770,13 +1770,13 @@ void processlength(double *valyew, double *divisor, Char *ch,
   *lengthIsNegative = false;
   pointread = false;
   hasExponent = false;
-  exponentIsNegative = -1; // 3 states:  -1 = unassigned, 1 = true, 0 = false
+  exponentIsNegative = -1;
   exponent = 0;
   *valyew = 0.0;
   *divisor = 1.0;
   getch(ch, parens, treefile);
   if ('+' == *ch)
-    getch(ch, parens, treefile); // ignore leading '+', because "+1.2345" == "1.2345"
+    getch(ch, parens, treefile);
   else if ('-' == *ch)
     {
       *lengthIsNegative = true;
@@ -1798,7 +1798,7 @@ void processlength(double *valyew, double *divisor, Char *ch,
     else if ('+' == *ch)
       {
 	if (hasExponent && -1 == exponentIsNegative)
-	  exponentIsNegative = 0; // 3 states:  -1 = unassigned, 1 = true, 0 = false
+	  exponentIsNegative = 0;
 	else
 	  {
 	    printf("\n\nERROR: Branch length found with \'+\' in an unexpected place.\n\n");
@@ -1808,7 +1808,7 @@ void processlength(double *valyew, double *divisor, Char *ch,
     else if ('-' == *ch)
       {
 	if (hasExponent && -1 == exponentIsNegative)
-	  exponentIsNegative = 1; // 3 states:  -1 = unassigned, 1 = true, 0 = false
+	  exponentIsNegative = 1;
 	else
 	  {
 	    printf("\n\nERROR: Branch length found with \'-\' in an unexpected place.\n\n");
@@ -2213,7 +2213,7 @@ long countsemic(FILE **treefile)
 
   /* Then figure out if the first non-white character is a digit; if
      so, return it */
-  if (isdigit (c)) {
+  if (isdigit ((int)c)) {
     ungetc(c, *treefile);
     if (fscanf((*treefile), "%ld", &return_val) != 1) {
       printf("Error reading number of trees in tree file.\n\n");

@@ -1080,7 +1080,7 @@ void repreorder(node *p, boolean *success)
 {
   /* traverses a binary tree, calling PROCEDURE tryrearr
      at a node before calling tryrearr at its descendants */
-  node *q, *this;
+  node *q, *ths;
 
   if (p == NULL)
     return;
@@ -1091,9 +1091,9 @@ void repreorder(node *p, boolean *success)
   if (!p->tip) {
     q = p;
     while (q->next != p) {
-      this = q->next->back;
+      ths = q->next->back;
       repreorder(q->next->back,success);
-      if (q->next->back == this)
+      if (q->next->back == ths)
         q = q->next;
     }
   }
@@ -1575,18 +1575,17 @@ void freerest()
 
 
 char buf3[100000];
-char* dna(int argc, Char *argv[])
-{  /* DNA parsimony by uphill search */
+char* dna(int argc, const char *argv[]) {  /* DNA parsimony by uphill search */
   /* reads in spp, chars, and the data. Then calls maketree to
      construct the tree */
 #ifdef MAC
    argc = 1;        /* macsetup("Dnapars","");        */
    argv[0] = "Dnapars";
 #endif
-  init(argc, argv);
-  progname = argv[0];
+  init(argc, (char**)argv);
+  progname = (char*)argv[0];
 
-  infile = fmemopen( argv[1], strlen(argv[1]), "r" );
+  infile = fmemopen( (char*)argv[1], strlen(argv[1]), "r" );
   outfile = stderr;
 
   //openfile(&infile,INFILE,"input file", "r",argv[0],infilename);

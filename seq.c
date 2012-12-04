@@ -2405,7 +2405,7 @@ void hyprint(long b1, long b2, struct LOC_hyptrav *htrav,
     else {
       k = 1;
       n = 0;
-      for (b = A; b <= O; b = b + 1) {
+      for (b = (bases)A; b <= (bases)O; b = (bases)(b + 1)) {
         if (((1 << b) & htrav->tempset) != 0)
           n += k;
         k += k;
